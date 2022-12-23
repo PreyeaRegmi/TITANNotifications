@@ -2,8 +2,7 @@ const express = require("express");
 const app = express();
 const nodemailer = require("nodemailer");
 
-// const PORT = process.env.PORT || 5059;
-const PORT = process.env.PORT || 5064;
+const PORT = process.env.PORT || 5066;
 var admin = require("firebase-admin");
 var serviceAccount = require("./key/firebase_key.json");
 
@@ -24,11 +23,10 @@ let transporter = nodemailer.createTransport({
 app.listen(PORT, () => {
   console.log("Server started");
 
-  //Observe all the avialable event sources and send notification to the corresponding subscribed users.
   subscribeToFeedbackDocument();
 });
 
-//Subscribe to Transcore Stalled Vehicle Event
+//Subscribe to Feedback event
 function subscribeToFeedbackDocument() {
   return db
     .collection("UserFeedbacks")
@@ -64,13 +62,21 @@ function subscribeToFeedbackDocument() {
 
 function sendEmail(doc) {
   const mailOptions = {
-    from: 'feedback.ridsi@gmail.com', // Something like: Jane Doe <janedoe@gmail.com>
-    to: 'prrgfb@umsystem.edu',
-    subject: 'TITAN - Support Request', // email subject
-    html: `<p style="font-size: 16px;">Pickle Riiiiiiiiiiiiiiiick!!</p>
-        <br />
-        <img src="https://images.prod.meredith.com/product/fc8754735c8a9b4aebb786278e7265a5/1538025388228/l/rick-and-morty-pickle-rick-sticker" />
-    ` // email content in HTML
+    from: 'feedback.ridsi@gmail.com', 
+    to: 'ridsidash@gmail.com',
+    subject: 'TITAN - Support Request', 
+    html: `
+    <br>
+    <p style="font-size: 16px;"><b>Request Type: </b>`+doc.type+`</p>
+    <br>
+    <p style="font-size: 16px;"><b>Requester Name: </b>`+doc.requesterName+`</p>
+    <p style="font-size: 16px;"><b>Requester Email: </b>`+doc.requesterEmail+`</p>
+    <p style="font-size: 16px;"><b>Organization: </b>`+doc.organization+`</p>
+    <p style="font-size: 16px;"><b>Requested On: </b>`+doc.requestedDate+`</p>
+    <br>  
+    <p style="font-size: 16px;"><b>Description<b></p>
+    <p style="font-size: 16px;">`+doc.description+`</p>   
+     `
 };
   return transporter.sendMail(mailOptions);
 }
