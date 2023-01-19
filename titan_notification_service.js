@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const nodemailer = require("nodemailer");
 
+
+
 const PORT = process.env.PORT || 5066;
 var admin = require("firebase-admin");
 var serviceAccount = require("./key/firebase_key.json");
@@ -60,10 +62,25 @@ function subscribeToFeedbackDocument() {
     });
 }
 
+function isBlank(str) {
+  return (!str || /^\s*$/.test(str));
+}
+
 function sendEmail(doc) {
+  const attachements=[]
+  if(!isBlank(doc.attachmentUrl))
+  {
+    attachements.push(
+      {   
+        filename: doc.attachmentFileName,
+        path: doc.attachmentUrl 
+       }
+    )
+  }
   const mailOptions = {
     from: 'feedback.ridsi@gmail.com', 
     to: 'ridsidash@gmail.com',
+    attachments:attachements,
     subject: 'TITAN - Support Request', 
     html: `
     <br>
@@ -74,7 +91,7 @@ function sendEmail(doc) {
     <p style="font-size: 16px;"><b>Organization: </b>`+doc.organization+`</p>
     <p style="font-size: 16px;"><b>Requested On: </b>`+doc.requestedDate+`</p>
     <br>  
-    <p style="font-size: 16px;"><b>Description<b></p>
+    <p style="font-size: 16px;"><b>Description</b></p>
     <p style="font-size: 16px;">`+doc.description+`</p>   
      `
 };
