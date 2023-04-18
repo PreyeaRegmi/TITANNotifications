@@ -16,7 +16,7 @@ app.listen(PORT, () => {
   console.log("Server started");
 
   // Run the validateRegisteredDate() function every day at 2 AM
-  cron.schedule("44 20 * * *", () => {
+  cron.schedule("0 6 * * *", () => {
     checkForRenewal();
   });
 });
