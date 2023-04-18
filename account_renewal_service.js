@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cron = require("node-cron");
 
-const PORT = process.env.PORT || 5080;
+const PORT = process.env.PORT || 5067;
 var admin = require("firebase-admin");
 var serviceAccount = require("./key/firebase_key.json");
 
@@ -16,7 +16,7 @@ app.listen(PORT, () => {
   console.log("Server started");
 
   // Run the validateRegisteredDate() function every day at 2 AM
-  cron.schedule("0 2 * * *", () => {
+  cron.schedule("44 20 * * *", () => {
     checkForRenewal();
   });
 });
@@ -29,10 +29,10 @@ function checkForRenewal() {
       console.log("User data list size "+querySnapshot.size);
       var feedbackData = [];
       querySnapshot.forEach((doc) => {
-        var regDate = doc.data()['registeredDate'];
+        var regDate = doc.data()['renewalDate'];
         if (regDate ) {
           var days= daysDifference(regDate);
-          if(days>365)
+          if(days>=365)
           {
             doc.ref.set({ requiresRenewal: true },{ merge: true })
             .then(() => {
@@ -42,7 +42,8 @@ function checkForRenewal() {
               console.log("Error updating user " + doc.id + ". Reason: " + error.toString());
             });
           } 
-          console.log("User " + doc.id + " does not requires renewal. No of days exceeded "+days);       
+          else
+            console.log("User " + doc.id + " does not requires renewal. No of days exceeded "+days);       
         }
       });
       return feedbackData;
