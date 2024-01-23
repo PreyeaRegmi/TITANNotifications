@@ -20,7 +20,7 @@ app.listen(PORT, () => {
   console.log("Server started");
 
   // Run the validateRegisteredDate() function every day at 6 AM
-  cron.schedule("18 16 * * *", () => {
+  cron.schedule("40 16 * * *", () => {
     checkForRenewal();
   });
 });
@@ -39,16 +39,14 @@ function checkForRenewal() {
         if (regDate) {
           var days = daysDifference(regDate);
           if (days >= 365) {
+            logToConsoleAndFile(
+              "User " +
+                doc.id +
+                " requires renewal. No of days exceeded " +
+                days
+            );
             doc.ref
               .set({ requiresRenewal: true }, { merge: true })
-              .then(() => {
-                logToConsoleAndFile(
-                  "User " +
-                    doc.id +
-                    " requires renewal. No of days exceeded " +
-                    days
-                );
-              })
               .catch((error) => {
                 logToConsole(
                   "Error updating user " +
@@ -57,13 +55,7 @@ function checkForRenewal() {
                     error.toString()
                 );
               });
-          } else
-            logToConsole(
-              "User " +
-                doc.id +
-                " does not require renewal. No of days exceeded " +
-                days
-            );
+          } 
         }
       });
       return feedbackData;
@@ -87,6 +79,6 @@ function logToConsole(message)
 
 }
 function logToConsoleAndFile(message) {
-  
+  logToConsole(message)
   logStream.write(`${new Date().toISOString()} - ${message}\n`);
 }
