@@ -19,8 +19,8 @@ const logStream = fs.createWriteStream("account_renewal_log.txt", { flags: "a" }
 app.listen(PORT, () => {
   console.log("Server started");
 
-  // Run the validateRegisteredDate() function every day at 6 AM
-  cron.schedule("40 16 * * *", () => {
+  // Run the validateRegisteredDate() function every day at 12:00 AM UTC
+  cron.schedule("05 00 * * *", () => {
     checkForRenewal();
   });
 });
